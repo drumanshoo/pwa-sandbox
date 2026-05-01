@@ -1,0 +1,14 @@
+{
+  "name": "pwa-sandbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone PWA test bench: installable, offline, push notifications.",
+  "scripts": {
+    "dev": "vercel dev",
+    "vapid": "web-push generate-vapid-keys"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

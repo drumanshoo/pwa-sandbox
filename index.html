@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#87161a" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/icon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <title>PWA Sandbox</title>
+</head>
+<body>
+  <header>
+    <h1>PWA Sandbox</h1>
+    <p class="sub">Three tiers. Walk them in order.</p>
+    <div id="env-banner" class="env-banner" hidden></div>
+  </header>
+
+  <main>
+    <!-- ─────────────── PHASE 1 ─────────────── -->
+    <section class="phase" id="phase-1">
+      <div class="phase-head">
+        <span class="phase-num">1</span>
+        <h2>Installable</h2>
+        <span class="status-pill" id="status-install">checking…</span>
+      </div>
+      <p>Service worker registers, manifest is valid, icons load, and the browser exposes an install prompt.</p>
+      <ul class="checks">
+        <li id="chk-https">HTTPS / localhost</li>
+        <li id="chk-manifest">Manifest reachable</li>
+        <li id="chk-sw">Service worker registered</li>
+        <li id="chk-installable">Install prompt available</li>
+        <li id="chk-installed">Running as installed app</li>
+      </ul>
+      <button id="btn-install" disabled>Install app</button>
+      <p class="hint">On iOS the prompt won't fire — use Safari's Share → "Add to Home Screen".</p>
+    </section>
+
+    <!-- ─────────────── PHASE 2 ─────────────── -->
+    <section class="phase" id="phase-2">
+      <div class="phase-head">
+        <span class="phase-num">2</span>
+        <h2>Offline</h2>
+        <span class="status-pill" id="status-offline">checking…</span>
+      </div>
+      <p>The app shell is cached on first load. Toggle airplane mode (or DevTools → Network → Offline) and reload — the page should still render, and uncached navigations should fall back to <code>offline.html</code>.</p>
+      <ul class="checks">
+        <li id="chk-cache">App shell cached</li>
+        <li id="chk-online">Currently online</li>
+      </ul>
+      <div class="row">
+        <button id="btn-test-offline">Try fetching /not-cached.html</button>
+        <button id="btn-clear-cache" class="secondary">Clear caches</button>
+      </div>
+      <pre id="offline-output" class="output" hidden></pre>
+    </section>
+
+    <!-- ─────────────── PHASE 3 ─────────────── -->
+    <section class="phase" id="phase-3">
+      <div class="phase-head">
+        <span class="phase-num">3</span>
+        <h2>Push notifications</h2>
+        <span class="status-pill" id="status-push">checking…</span>
+      </div>
+      <p>The browser asks for permission, generates a <code>PushSubscription</code> tied to a VAPID public key, and stores it locally. The "Send test push" button POSTs that subscription to <code>/api/send-push</code>, which uses the matching private key to push a notification back.</p>
+      <ul class="checks">
+        <li id="chk-push-supported">Push API supported</li>
+        <li id="chk-permission">Notification permission</li>
+        <li id="chk-subscription">Subscription active</li>
+        <li id="chk-vapid">VAPID public key fetched</li>
+      </ul>
+      <div class="row">
+        <button id="btn-subscribe">Enable notifications</button>
+        <button id="btn-send-push" disabled>Send test push</button>
+        <button id="btn-unsubscribe" class="secondary" disabled>Unsubscribe</button>
+      </div>
+
+      <details class="ios-note">
+        <summary>iOS gotcha (read this if testing on iPhone)</summary>
+        <ol>
+          <li>Requires iOS 16.4 or later.</li>
+          <li>Open this site in Safari, tap Share, "Add to Home Screen".</li>
+          <li>Open the app from the home-screen icon — <strong>not</strong> a Safari tab.</li>
+          <li>Then tap "Enable notifications".</li>
+        </ol>
+        <p>Subscribing from a Safari tab will silently fail.</p>
+      </details>
+
+      <pre id="push-log" class="output" hidden></pre>
+    </section>
+  </main>
+
+  <footer>
+    <p>Service worker version: <code id="sw-version">…</code></p>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
