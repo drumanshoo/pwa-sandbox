@@ -76,6 +76,15 @@
         <button id="btn-unsubscribe" class="secondary" disabled>Unsubscribe</button>
       </div>
 
+      <p class="hint" style="margin-top:1rem">
+        <strong>Cross-device broadcast.</strong> Each device that subscribes is registered server-side in Vercel KV.
+        The broadcast button below posts to <code>/api/broadcast</code>, which fans out to every stored subscription —
+        so a push from desktop reaches the iPhone (and vice versa). Dead subscriptions get cleaned up on 410.
+      </p>
+      <div class="row">
+        <button id="btn-broadcast">Broadcast to all subscribed devices</button>
+      </div>
+
       <details class="ios-note">
         <summary>iOS gotcha (read this if testing on iPhone)</summary>
         <ol>

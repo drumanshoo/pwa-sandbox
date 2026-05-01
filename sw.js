@@ -1,5 +1,5 @@
 // Bump this any time the cached app shell changes.
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `pwa-sandbox-${CACHE_VERSION}`;
 
 const APP_SHELL = [

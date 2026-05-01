@@ -210,6 +210,23 @@ const urlB64ToUint8 = (base64) => {
   const reg = await navigator.serviceWorker.ready;
   let sub = await reg.pushManager.getSubscription();
 
+  // Make sure any pre-existing local sub is also in the server registry,
+  // so broadcasts from this device or another will reach it.
+  const registerOnServer = async (s) => {
+    try {
+      const r = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: s }),
+      });
+      const txt = await r.text();
+      log('push-log', `registry: ${r.status} ${txt}`);
+    } catch (e) {
+      log('push-log', `registry error: ${e.message}`);
+    }
+  };
+  if (sub) registerOnServer(sub);
+
   const reflectSub = () => {
     if (sub) {
       setCheck('chk-subscription', 'ok');
@@ -243,6 +260,7 @@ const urlB64ToUint8 = (base64) => {
       });
       localStorage.setItem('pwa-sandbox-subscription', JSON.stringify(sub));
       log('push-log', `subscribed: endpoint=${sub.endpoint.slice(0, 60)}…`);
+      await registerOnServer(sub);
       reflectSub();
     } catch (e) {
       log('push-log', `subscribe failed: ${e.message}`);
@@ -276,8 +294,29 @@ const urlB64ToUint8 = (base64) => {
     if (!sub) return;
     await sub.unsubscribe();
     localStorage.removeItem('pwa-sandbox-subscription');
-    log('push-log', 'unsubscribed');
+    log('push-log', 'unsubscribed (local — server registry cleans up on next broadcast)');
     sub = null;
     reflectSub();
+  });
+
+  $('btn-broadcast').addEventListener('click', async () => {
+    log('push-log', 'POST /api/broadcast …');
+    try {
+      const res = await fetch('/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payload: {
+            title: 'PWA Sandbox — broadcast',
+            body: `Hello to all devices — ${new Date().toLocaleTimeString()}`,
+            url: '/',
+          },
+        }),
+      });
+      const json = await res.json();
+      log('push-log', `→ ${res.status} total=${json.total} results=${JSON.stringify(json.results)}`);
+    } catch (e) {
+      log('push-log', `→ error: ${e.message}`);
+    }
   });
 })();
